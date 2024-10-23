@@ -27,16 +27,25 @@
             <th>Toppings</th>
             <th>Bottoms</th>
             <th>Antal</th>
+            <th>Handling</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="order : ${orders}">
             <td th:text="${order.orderId}">Ordre ID</td>
             <td th:text="${order.customerName}">Kunde Navn</td>
-            <td th:text="${order.status}">Status</td>
+            <td th:text="${order.status}"
+                th:class="${order.status == 'betalt'} ? 'text-success' : 'text-danger'">Status</td>
             <td th:text="${order.orderDetails.toppings}">Toppings</td>
             <td th:text="${order.orderDetails.bottoms}">Bottoms</td>
             <td th:text="${order.orderDetails.quantity}">Antal</td>
+            <td>
+                <!-- Form til at sende DELETE anmodning -->
+                <form th:action="@{/admin/delete-order}" method="post">
+                    <input type="hidden" name="orderId" th:value="${order.orderId}"/>
+                    <button type="submit" class="btn btn-danger btn-sm">Slet</button>
+                </form>
+            </td>
         </tr>
         </tbody>
     </table>

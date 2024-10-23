@@ -5,10 +5,7 @@ import app.entities.OrderDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,4 +48,22 @@ public class Admin {
         return orders;  // Returner listen af ordrer
     }
 
+    public void deleteOrder(int orderId) {
+
+        DatabaseController db = new DatabaseController();
+        Connection connection = db.getConnection();
+        try {
+            String query = "DELETE FROM orders WHERE order_id = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, orderId);
+            statement.executeUpdate();
+
+            System.out.println("Order med ID " + orderId + " blev slettet.");
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            db.closeConnection();
+        }
+    }
 }
