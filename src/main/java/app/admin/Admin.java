@@ -2,7 +2,7 @@ package app.admin;
 import app.controllers.DatabaseController;
 import app.entities.Order;
 import app.entities.OrderDetails;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper; // Håndtering af JSON DATA
 
 import java.io.IOException;
 import java.sql.*;
@@ -10,9 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Admin {
-
-
-
 
 
     public List<Order> getOrders() {
