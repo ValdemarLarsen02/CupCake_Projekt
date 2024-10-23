@@ -1,5 +1,6 @@
 package app.controllers;
 
+import app.utils.ErrorLogger;
 import io.github.cdimascio.dotenv.Dotenv;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -21,7 +22,7 @@ public class DatabaseController {
             connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
             System.out.println("Forbindelse til databasen blev oprettet.");
         } catch (SQLException e) {
-            e.printStackTrace();
+            ErrorLogger.logError(e);
         }
     }
 
@@ -36,7 +37,7 @@ public class DatabaseController {
                 System.out.println("Forbindelsen til databasen blev lukket.");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            ErrorLogger.logError(e);
         }
     }
 }

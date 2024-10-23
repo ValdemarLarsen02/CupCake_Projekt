@@ -2,6 +2,7 @@ package app.admin;
 import app.controllers.DatabaseController;
 import app.entities.Order;
 import app.entities.OrderDetails;
+import app.utils.ErrorLogger;
 import com.fasterxml.jackson.databind.ObjectMapper; // Håndtering af JSON DATA
 
 import java.io.IOException;
@@ -37,7 +38,7 @@ public class Admin {
             }
 
         } catch (SQLException | IOException ex) {
-            ex.printStackTrace();
+            ErrorLogger.logError(ex);
         } finally {
             db.closeConnection();  // Lukker forbindelse
         }
@@ -58,7 +59,7 @@ public class Admin {
             System.out.println("Order med ID " + orderId + " blev slettet.");
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            ErrorLogger.logError(ex);
         } finally {
             db.closeConnection();
         }
