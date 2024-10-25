@@ -1,20 +1,42 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
-<title>Admin</title>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="../public/css/styles.css" th:href="@{/css/styles.css}" rel="stylesheet"/>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<head>
+    <title>Admin</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="../public/css/styles.css" th:href="@{/css/styles.css}" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 
 <body>
-index.html
+<div class="container mt-5">
+    <h1>Admin Dashboard</h1>
+    <p>Velkommen til adminpanelet. Her kan du indsætte penge på en kundes konto.</p>
 
+    <!-- Formular til at indsætte penge på en kundes konto -->
+    <h2>Indsæt penge på kundens konto</h2>
+    <form action="/admin/indsaet-beloeb" method="POST" class="mt-4">
+        <div class="mb-3">
+            <label for="kundeId" class="form-label">Kunde ID:</label>
+            <input type="number" id="kundeId" name="kundeId" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="beloeb" class="form-label">Beløb:</label>
+            <input type="number" id="beloeb" name="beloeb" class="form-control" step="0.01" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Indsæt beløb</button>
+    </form>
 
-<p>Hello, World</p>
+    <!-- Område til at vise eventuelle beskeder -->
+    <div class="mt-4">
+        <p th:text="${message}"></p> <!-- Dynamisk besked fra backend -->
+    </div>
+</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
 </body>
 </html>
-
