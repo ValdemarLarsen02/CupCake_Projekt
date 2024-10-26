@@ -42,6 +42,6 @@ public class UserMapperTest {
             UserMapper.login(username, databaseController);
         });
 
-        assertEquals("Fejl i login. Prøv igen", exception.getMessage());
+        assertEquals("User not found in database", exception.getMessage());
     }
 }
