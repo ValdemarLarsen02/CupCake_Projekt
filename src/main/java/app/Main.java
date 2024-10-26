@@ -3,6 +3,7 @@ package app;
 import app.config.SessionConfig;
 import app.config.ThymeleafConfig;
 import app.controllers.DatabaseController;
+import app.controllers.UserController;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinThymeleaf;
 
@@ -24,8 +25,8 @@ public class Main {
         //Starter databasen forbindelse
 
         DatabaseController db = new DatabaseController();
+        UserController.addRoutes(app, db);
 
-
-        app.get("/", ctx ->  ctx.render("index.html"));
+        app.get("/", ctx ->  ctx.render("login.html"));
     }
 }
