@@ -5,6 +5,7 @@ import app.config.ThymeleafConfig;
 import app.controllers.CupcakeController;
 import app.controllers.DatabaseController;
 import app.controllers.PaymentController;
+import app.controllers.UserController;
 import app.services.CupcakeService;
 import app.services.PaymentService;
 import io.javalin.Javalin;
@@ -28,6 +29,7 @@ public class Main {
 
         // Initialiser controllers
         CupcakeController.registerRoutes(app);
+        UserController.addRoutes(app, dbController);
         PaymentController paymentController = new PaymentController(paymentService, cupcakeService);
         paymentController.registerRoutes(app);
     }
