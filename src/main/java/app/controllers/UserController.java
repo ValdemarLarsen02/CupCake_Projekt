@@ -46,10 +46,8 @@ public class UserController {
         String password = ctx.formParam("password");
 
         try {
-            // Attempt to retrieve the user by username
             User user = UserMapper.login(username, databaseController);
 
-            // Verify password if user exists
             if (user != null) {
                 ctx.sessionAttribute("currentUser", user);
                 ctx.attribute("message", "You are now logged in.");

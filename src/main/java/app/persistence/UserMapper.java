@@ -4,7 +4,6 @@ import app.controllers.DatabaseController;
 import app.entities.User;
 import app.exceptions.DatabaseException;
 import org.mindrot.jbcrypt.BCrypt;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,7 +11,6 @@ import java.sql.SQLException;
 
 public class UserMapper {
 
-    // Login method without BCrypt verification; verification is done in UserController
     public static User login(String userName, DatabaseController databaseController) throws DatabaseException {
         String sql = "SELECT user_id, password, role FROM public.\"users\" WHERE username=?";
 
@@ -30,14 +28,13 @@ public class UserMapper {
 
                 return new User(id, userName, hashedPassword, role);
             } else {
-                throw new DatabaseException("User not found in database");
+                throw new DatabaseException("Bruger ikke fundet.");
             }
         } catch (SQLException e) {
-            throw new DatabaseException("Database error occurred. Please try again later.");
+            throw new DatabaseException("Database fejl, prøv igen senere.");
         }
     }
 
-    // Method to create a new user with hashed password
     public static void createUser(String userName, String hashedPassword, DatabaseController databaseController) throws DatabaseException {
         String sql = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
 
@@ -51,15 +48,14 @@ public class UserMapper {
 
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected != 1) {
-                throw new DatabaseException("Error creating new user");
+                throw new DatabaseException("Fejl i oprettelse af bruger.");
             }
         } catch (SQLException e) {
-            String msg = "An error occurred. Please try again";
-            if (e.getMessage().startsWith("ERROR: duplicate key value ")) {
-                msg = "Username already exists. Choose a different one";
+            String msg = "Der skete en fejl, prøv igen.";
+            if (e.getMessage().startsWith("FEJL: duplicate key value ")) {
+                msg = "Brugernavn findes allerede, prøv et andet.";
             }
             throw new DatabaseException(msg);
         }
     }
-
 }

@@ -15,11 +15,6 @@ public class User
         this.role = role;
     }
 
-    public int getUserId()
-    {
-        return userId;
-    }
-
     public String getUserName()
     {
         return userName;
@@ -30,11 +25,6 @@ public class User
         return hashedPassword;
     }
 
-    public String getRole()
-    {
-        return role;
-    }
-
     @Override
     public String toString()
     {
@@ -43,9 +33,5 @@ public class User
                 ", userName='" + userName + '\'' +
                 ", role='" + role + '\'' +  // Avoid displaying hashedPassword
                 '}';
-    }
-
-    public int getId() {
-        return userId;
     }
 }
