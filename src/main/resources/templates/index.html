@@ -30,9 +30,10 @@
         <div class="user-info d-flex justify-content-end p-3">
         <span th:if="${session.currentUser != null}">
             Logget ind som: <strong th:text="${session.currentUser.username}"></strong>
+            <a th:href="@{/logout}">Log af</a>
         </span>
             <span th:if="${session.currentUser == null}">
-            Not logged in
+            Ikke logget på | <a th:href="@{/tilLogin}">Log på</a>
         </span>
         </div>
 

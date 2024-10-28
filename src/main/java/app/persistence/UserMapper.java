@@ -13,11 +13,11 @@ public class UserMapper {
 
     public static User login(String userName, DatabaseController databaseController) throws DatabaseException {
         String sql = "SELECT user_id, password, role FROM public.\"users\" WHERE username=?";
+        Connection connection = databaseController.getConnection();
 
-        try (
-                Connection connection = databaseController.getConnection();
-                PreparedStatement ps = connection.prepareStatement(sql)
-        ) {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, userName);
 
             ResultSet rs = ps.executeQuery();
@@ -32,6 +32,7 @@ public class UserMapper {
                 throw new DatabaseException("Bruger ikke fundet."); // User not found
             }
         } catch (SQLException e) {
+            System.out.println(e.getMessage());
             throw new DatabaseException("Database fejl, prøv igen senere."); // General DB error
         }
     }

@@ -34,5 +34,6 @@ public class Main {
         CupcakeController.registerRoutes(app);
         PaymentController.registerRoutes(app);
         CustomerController.registerRoutes(app);
+
     }
 }
