@@ -31,7 +31,8 @@ public class UserController {
             try {
                 UserMapper.createUser(username, hashedPassword, databaseController);
                 ctx.attribute("message", "You are now registered with username: " + username + ". Please log in.");
-                ctx.render("index.html");
+                //ctx.render("index.html"); Fjernet da den ikke sender korrekt tilbage til forsiden.
+                ctx.redirect("/");
             } catch (DatabaseException e) {
                 ctx.attribute("message", "Username already exists. Try again or log in.");
                 ctx.render("createuser.html");
@@ -53,7 +54,8 @@ public class UserController {
             if (BCrypt.checkpw(password, user.getPassword())) {
                 ctx.sessionAttribute("currentUser", user);
                 ctx.attribute("message", "You are now logged in.");
-                ctx.render("index.html");
+                //ctx.render("index.html"); Fjernet da den ikke sender korrekt tilbage til forsiden.
+                ctx.redirect("/");
             } else {
                 // If the password doesn't match
                 ctx.attribute("message", "Invalid password. Please try again.");

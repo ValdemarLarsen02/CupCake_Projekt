@@ -17,11 +17,13 @@ public class PaymentController {
             var cartItems = cupcakeService.getCartItems();
             double totalPrice = cupcakeService.calculateTotalPrice();
 
-            // Hent kunde fra sessionen
-            Customer currentCustomer = ctx.sessionAttribute("currentUser");
-            if (currentCustomer == null) {
-                ctx.redirect("/login");
-                return;
+            // Hent data fra session
+            Object sessionUser = ctx.sessionAttribute("currentUser");
+            if (sessionUser instanceof Customer currentCustomer) {
+                ctx.attribute("cartItems", cartItems);
+                ctx.attribute("totalPrice", totalPrice);
+                ctx.attribute("customerName", currentCustomer.getName()); // Tilføj brugerens navn eller andre detaljer
+                ctx.render("payment.html");
             }
 
             ctx.attribute("cartItems", cartItems);

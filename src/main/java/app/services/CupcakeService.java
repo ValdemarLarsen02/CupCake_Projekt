@@ -23,12 +23,12 @@ public class CupcakeService {
 
     // Metode til at hente singleton-instansen
     public static CupcakeService getInstance() {
-
         return instance;
     }
 
     // Hent bunde
     public List<String> getBottoms() throws SQLException {
+        System.out.println(cart.size());
         Connection connection = dbController.getConnection();
         Statement stmt = connection.createStatement();
         ResultSet rs = stmt.executeQuery("SELECT bottom FROM bottoms");
@@ -56,12 +56,12 @@ public class CupcakeService {
     }
 
     // Tilføj ordre til kurven og databasen
-    public void addToCart(String customerName, String bottom, String topping, int quantity, boolean isPaid) throws SQLException {
+    public void addToCart(int userId, String customerName, String bottom, String topping, int quantity, boolean isPaid) throws SQLException {
         Connection connection = dbController.getConnection();
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
-            connection.setAutoCommit(false);  //Start transaktion
+            connection.setAutoCommit(false);  // Start transaktion
 
             // Beregn priser
             double bottomPrice = getPriceFromDatabase("bottoms", bottom, connection);
@@ -81,17 +81,18 @@ public class CupcakeService {
             );
 
             // Indsæt ordren i databasen
-            String query = "INSERT INTO orders (customer_name, order_details, order_date, status, total_price) VALUES (?, ?::jsonb, ?, ?, ?)";
+            String query = "INSERT INTO orders (user_id, customer_name, order_details, order_date, status, total_price) VALUES (?, ?, ?::jsonb, ?, ?, ?)";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
-                statement.setString(1, customerName);
-                statement.setObject(2, orderDetailsJson);
-                statement.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
-                statement.setString(4, isPaid ? "betalt" : "ikke betalt");
-                statement.setDouble(5, totalPrice);
+                statement.setInt(1, userId);
+                statement.setString(2, customerName);
+                statement.setObject(3, orderDetailsJson);
+                statement.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
+                statement.setString(5, isPaid ? "betalt" : "ikke betalt");
+                statement.setDouble(6, totalPrice);
 
                 statement.executeUpdate();
                 connection.commit();  // Bekræft transaktion
-                System.out.println("Order was added to the database for customer: " + customerName);
+                System.out.println("Order was added to the database for customer: " + customerName + " with user ID: " + userId);
             } catch (SQLException e) {
                 connection.rollback();  // Undo hvis fejl skulle forekomme
                 throw new SQLException("Error inserting order into the database: " + e.getMessage());
@@ -101,6 +102,7 @@ public class CupcakeService {
             throw new RuntimeException(e);
         }
     }
+
 
     // Fjern en ordre fra kurven og databasen
     public void removeFromCart(int orderLineId) throws SQLException {

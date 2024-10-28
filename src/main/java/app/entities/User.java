@@ -19,7 +19,9 @@ public class User {
         return userName;
     }
 
-
+    public Integer getUserId() {
+        return userId;
+    }
 
     @Override
     public String toString() {
