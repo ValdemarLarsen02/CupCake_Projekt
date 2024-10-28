@@ -25,14 +25,20 @@ public class CupcakeController {
             String selectedTopping = ctx.formParam("topping");
             int quantity = Integer.parseInt(ctx.formParam("quantity"));
 
+
+            String customerName = "Default customer";  // Erstat med faktisk værdi
+            boolean isPaid = false;  // Placeholder for om ordren er betalt, evt. fra en formular
+
             if (selectedBottom == null || selectedTopping == null) {
                 ctx.status(400).result("You must select both a bottom and a topping.");
                 return;
             }
 
-            cupcakeService.addToCart(selectedBottom, selectedTopping, quantity);
+
+            cupcakeService.addToCart(customerName, selectedBottom, selectedTopping, quantity, isPaid);
             ctx.redirect("/cart");
         });
+
 
         app.get("/cart", ctx -> {
             List<OrderLine> cartItems = cupcakeService.getCartItems();

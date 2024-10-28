@@ -36,17 +36,17 @@
 
     <!-- Betalingsformular -->
     <form action="/process-payment" method="POST" class="mt-4">
-        <input type="hidden" name="amount" th:value="${totalPrice}" />
+        <input type="hidden" name="amount" th:value="${totalPrice}"/>
         <button type="submit" class="btn btn-primary">Betal nu</button>
     </form>
-<div class="user-info d-flex justify-content-end p-3">
+    <div class="user-info d-flex justify-content-end p-3">
         <span th:if="${session.currentUser != null}">
             Logget ind som: <strong th:text="${session.currentUser.username}"></strong>
         </span>
-    <span th:if="${session.currentUser == null}">
+        <span th:if="${session.currentUser == null}">
             Ingen bruger
         </span>
-</div>
+    </div>
 
     <a href="/cart" class="btn btn-secondary mt-3">Tilbage til kurv</a>
 </div>

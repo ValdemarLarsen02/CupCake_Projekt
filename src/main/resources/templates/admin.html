@@ -29,14 +29,14 @@
         <button type="submit" class="btn btn-primary">Indsæt beløb</button>
     </form>
 
-<div class="user-info d-flex justify-content-end p-3">
+    <div class="user-info d-flex justify-content-end p-3">
         <span th:if="${session.currentUser != null}">
             Logget ind som: <strong th:text="${session.currentUser.username}"></strong>
         </span>
-    <span th:if="${session.currentUser == null}">
+        <span th:if="${session.currentUser == null}">
             Ingen bruger
         </span>
-</div>
+    </div>
     <!-- Område til at vise eventuelle beskeder -->
     <div class="mt-4">
         <p th:text="${message}"></p> <!-- Dynamisk besked fra backend -->

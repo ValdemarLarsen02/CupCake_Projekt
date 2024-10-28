@@ -22,14 +22,14 @@
                 </th:block>
             </select>
         </div>
-<div class="user-info d-flex justify-content-end p-3">
+        <div class="user-info d-flex justify-content-end p-3">
         <span th:if="${session.currentUser != null}">
             Logget ind som: <strong th:text="${session.currentUser.username}"></strong>
         </span>
-    <span th:if="${session.currentUser == null}">
+            <span th:if="${session.currentUser == null}">
             Not logged in
         </span>
-</div>
+        </div>
 
         <div class="mb-3">
             <label for="topping" class="form-label">Vælg topping:</label>
