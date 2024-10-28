@@ -9,10 +9,19 @@ import java.util.List;
 
 public class CupcakeService {
 
+    private static final CupcakeService instance = new CupcakeService();
     private final List<OrderLine> cart = new ArrayList<>();
     private final DatabaseController dbController = new DatabaseController();
 
-    //Hent bunde
+    // Privat constructor for at forhindre eksterne instanser
+    private CupcakeService() {}
+
+    // Metode til at hente singleton-instansen
+    public static CupcakeService getInstance() {
+        return instance;
+    }
+
+    // Hent bunde
     public List<String> getBottoms() throws SQLException {
         Connection connection = dbController.getConnection();
         Statement stmt = connection.createStatement();
@@ -26,7 +35,7 @@ public class CupcakeService {
         return bottoms;
     }
 
-    //Hent toppings
+    // Hent toppings
     public List<String> getToppings() throws SQLException {
         Connection connection = dbController.getConnection();
         Statement stmt = connection.createStatement();
@@ -62,7 +71,6 @@ public class CupcakeService {
 
     private double getPriceFromDatabase(String table, String name) throws SQLException {
         Connection connection = dbController.getConnection();
-        // Bestem kolonnen baseret på tabellen
         String column = table.equals("toppings") ? "topping" : "bottom";
         PreparedStatement stmt = connection.prepareStatement("SELECT price FROM " + table + " WHERE " + column + " = ?");
         stmt.setString(1, name);

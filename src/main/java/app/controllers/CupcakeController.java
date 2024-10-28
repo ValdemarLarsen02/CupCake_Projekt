@@ -8,7 +8,7 @@ import java.util.List;
 
 public class CupcakeController {
 
-    private static final CupcakeService cupcakeService = new CupcakeService();
+    private static final CupcakeService cupcakeService = CupcakeService.getInstance();
 
     public static void registerRoutes(Javalin app) {
         app.get("/", ctx -> {
@@ -17,7 +17,7 @@ public class CupcakeController {
 
             ctx.attribute("bottoms", bottoms);
             ctx.attribute("toppings", toppings);
-            ctx.render("index.html"); // Indeks-side hvor kunden vælger cupcakes
+            ctx.render("index.html");
         });
 
         app.post("/add-to-cart", ctx -> {
@@ -31,7 +31,7 @@ public class CupcakeController {
             }
 
             cupcakeService.addToCart(selectedBottom, selectedTopping, quantity);
-            ctx.redirect("/cart"); // Går videre til indkøbskurven
+            ctx.redirect("/cart");
         });
 
         app.get("/cart", ctx -> {
@@ -39,7 +39,7 @@ public class CupcakeController {
             double totalPrice = cupcakeService.calculateTotalPrice();
             ctx.attribute("cartItems", cartItems);
             ctx.attribute("totalPrice", totalPrice);
-            ctx.render("basket.html"); // Side hvor man ser indkøbskurven
+            ctx.render("basket.html");
         });
 
         app.post("/remove-from-cart", ctx -> {

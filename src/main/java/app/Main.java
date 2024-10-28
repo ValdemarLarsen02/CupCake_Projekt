@@ -3,7 +3,9 @@ package app;
 import app.config.SessionConfig;
 import app.config.ThymeleafConfig;
 import app.controllers.CupcakeController;
+import app.controllers.CustomerController;
 import app.controllers.DatabaseController;
+import app.controllers.PaymentController;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinThymeleaf;
 
@@ -21,5 +23,7 @@ public class Main {
 
         // Registering routes
         CupcakeController.registerRoutes(app);
+        PaymentController.registerRoutes(app);
+        CustomerController.registerRoutes(app);
     }
 }
