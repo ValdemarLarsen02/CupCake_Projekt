@@ -1,7 +1,6 @@
 package app.controllers;
 
 import io.github.cdimascio.dotenv.Dotenv;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,7 +11,6 @@ public class DatabaseController {
 
     // Constructor
     public DatabaseController() {
-        // Læs miljøvariabler fra .env filen for at beskytte databaseoplysninger
         Dotenv dotenv = Dotenv.load();
 
         String dbUrl = dotenv.get("DB_URL");
@@ -20,21 +18,20 @@ public class DatabaseController {
         String dbPassword = dotenv.get("DB_PASSWORD");
 
         try {
-            // Opret forbindelse til databasen
+            // Opretter forbindelse til databasen
             connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
             System.out.println("Forbindelse til databasen blev oprettet.");
         } catch (SQLException e) {
-            // Fejlhåndtering ved oprettelse af forbindelse
             System.err.println("Kunne ikke oprette forbindelse til databasen: " + e.getMessage());
         }
     }
 
-    // Returner forbindelsen
+    // Returnerer forbindelsen
     public Connection getConnection() {
         return connection;
     }
 
-    // Luk forbindelsen
+    // Lukker forbindelsen
     public void closeConnection() {
         try {
             if (connection != null && !connection.isClosed()) {
@@ -46,7 +43,7 @@ public class DatabaseController {
         }
     }
 
-    // Genetabler forbindelse (hvis nødvendigt)
+    // Genetablerer forbindelse (hvis nødvendigt)
     public void reconnect() {
         try {
             if (connection == null || connection.isClosed()) {
@@ -63,9 +60,9 @@ public class DatabaseController {
         }
     }
 
-    // Opdater kundens saldo i databasen
+    // Opdaterer kundens saldo i databasen
     public void opdaterSaldo(int kundeId, double beloeb) {
-        String sql = "UPDATE kunder SET saldo = saldo + ? WHERE id = ?";
+        String sql = "UPDATE customers SET balance = balance + ? WHERE customer_id = ?";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setDouble(1, beloeb);

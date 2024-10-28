@@ -1,32 +1,44 @@
 package app.services;
 
-import app.controllers.DatabaseController;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class PaymentService {
 
-    private final DatabaseController dbController = new DatabaseController();
+    private final Connection connection;
 
-    // Metode til at håndtere betalingen af en ordre
+    public PaymentService(Connection connection) {
+        this.connection = connection;
+    }
+
     public boolean processPayment(int customerId, double amount) {
-        Connection connection = dbController.getConnection();
-        try {
-            // Opdater kundens saldo eller betalingsstatus i databasen
-            String sql = "UPDATE customers SET balance = balance - ? WHERE customer_id = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-                stmt.setDouble(1, amount);
-                stmt.setInt(2, customerId);
-                int rowsAffected = stmt.executeUpdate();
+        String checkBalanceSQL = "SELECT balance FROM customers WHERE customer_id = ?";
+        String updateBalanceSQL = "UPDATE customers SET balance = balance - ? WHERE customer_id = ?";
 
-                // Hvis vi opdaterede en række, var betalingen succesfuld
-                return rowsAffected > 0;
+        try (PreparedStatement checkStmt = connection.prepareStatement(checkBalanceSQL)) {
+            checkStmt.setInt(1, customerId);
+            ResultSet rs = checkStmt.executeQuery();
+
+            if (rs.next()) {
+                double balance = rs.getDouble("balance");
+
+                // Tjekker om kunden har nok penge til at gennemføre betalingen
+                if (balance < amount) {
+                    return false;  // Ikke tilstrækkelig balance
+                }
+
+                try (PreparedStatement updateStmt = connection.prepareStatement(updateBalanceSQL)) {
+                    updateStmt.setDouble(1, amount);
+                    updateStmt.setInt(2, customerId);
+                    int rowsUpdated = updateStmt.executeUpdate();
+                    return rowsUpdated > 0;  // Returnerer true, hvis betalingen gik igennem
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
 }

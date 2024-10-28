@@ -3,37 +3,32 @@ package app;
 import app.config.SessionConfig;
 import app.config.ThymeleafConfig;
 import app.controllers.CupcakeController;
-import app.controllers.CustomerController;
 import app.controllers.DatabaseController;
 import app.controllers.PaymentController;
-import app.controllers.UserController;
+import app.services.CupcakeService;
+import app.services.PaymentService;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinThymeleaf;
 
-
 public class Main {
-    public static void main(String[] args)
-    {
-        // Initializing Javalin and Jetty webserver
-
+    public static void main(String[] args) {
+        // Initialiser Javalin og Jetty webserver
         Javalin app = Javalin.create(config -> {
             config.staticFiles.add("/public");
-            config.jetty.modifyServletContextHandler(handler ->  handler.setSessionHandler(SessionConfig.sessionConfig()));
+            config.jetty.modifyServletContextHandler(handler -> handler.setSessionHandler(SessionConfig.sessionConfig()));
             config.fileRenderer(new JavalinThymeleaf(ThymeleafConfig.templateEngine()));
         }).start(7070);
 
-        // Routing
+        // Initialiser DatabaseController
+        DatabaseController dbController = new DatabaseController();
 
+        // Initialiser services
+        CupcakeService cupcakeService = CupcakeService.getInstance();
+        PaymentService paymentService = new PaymentService(dbController.getConnection());
 
-        //Starter databasen forbindelse
-
-        DatabaseController db = new DatabaseController();
-        UserController.addRoutes(app, db);
-
-        // Registering routes
+        // Initialiser controllers
         CupcakeController.registerRoutes(app);
-        PaymentController.registerRoutes(app);
-        CustomerController.registerRoutes(app);
-
+        PaymentController paymentController = new PaymentController(paymentService, cupcakeService);
+        paymentController.registerRoutes(app);
     }
 }
