@@ -48,16 +48,21 @@ public class UserController {
         try {
             User user = UserMapper.login(username, databaseController);
 
-            if (user != null) {
+            // Check if the password matches
+            if (BCrypt.checkpw(password, user.getPassword())) {
                 ctx.sessionAttribute("currentUser", user);
                 ctx.attribute("message", "You are now logged in.");
                 ctx.render("index.html");
             } else {
-                ctx.attribute("message", "Invalid username or password.");
+                // If the password doesn't match
+                ctx.attribute("message", "Invalid password. Please try again.");
                 ctx.render("login.html");
             }
         } catch (DatabaseException e) {
-            ctx.attribute("message", "An error occurred during login. Please try again.");
+            // Display user-friendly error
+            ctx.attribute("message", e.getMessage().contains("Bruger ikke fundet")
+                    ? "Username not found. Please try again."
+                    : "An error occurred during login. Please try again later.");
             ctx.render("login.html");
         }
     }
