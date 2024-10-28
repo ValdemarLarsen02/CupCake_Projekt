@@ -6,6 +6,7 @@
     <title>Bestil cupcakes</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
 <div class="container mt-5">
     <h1>Velkommen</h1>
@@ -21,6 +22,14 @@
                 </th:block>
             </select>
         </div>
+<div class="user-info d-flex justify-content-end p-3">
+        <span th:if="${session.currentUser != null}">
+            Logget ind som: <strong th:text="${session.currentUser.username}"></strong>
+        </span>
+    <span th:if="${session.currentUser == null}">
+            Not logged in
+        </span>
+</div>
 
         <div class="mb-3">
             <label for="topping" class="form-label">Vælg topping:</label>
@@ -48,3 +57,4 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
