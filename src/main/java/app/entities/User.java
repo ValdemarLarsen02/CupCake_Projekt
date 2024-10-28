@@ -1,5 +1,7 @@
 package app.entities;
 
+import java.sql.SQLOutput;
+
 public class User
 {
     private int userId;
@@ -20,10 +22,7 @@ public class User
         return userName;
     }
 
-    public String getHashedPassword()  // Updated getter name to match field
-    {
-        return hashedPassword;
-    }
+
 
     @Override
     public String toString()
@@ -33,5 +32,10 @@ public class User
                 ", userName='" + userName + '\'' +
                 ", role='" + role + '\'' +  // Avoid displaying hashedPassword
                 '}';
+    }
+
+    public String getPassword() {
+        System.out.println(hashedPassword);
+        return hashedPassword;
     }
 }

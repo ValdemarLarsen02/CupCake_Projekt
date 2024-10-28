@@ -26,12 +26,13 @@ public class UserMapper {
                 String hashedPassword = rs.getString("password");
                 String role = rs.getString("role");
 
+                // Return user object with hashed password for verification in the controller
                 return new User(id, userName, hashedPassword, role);
             } else {
-                throw new DatabaseException("Bruger ikke fundet.");
+                throw new DatabaseException("Bruger ikke fundet."); // User not found
             }
         } catch (SQLException e) {
-            throw new DatabaseException("Database fejl, prøv igen senere.");
+            throw new DatabaseException("Database fejl, prøv igen senere."); // General DB error
         }
     }
 
