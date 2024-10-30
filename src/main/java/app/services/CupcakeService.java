@@ -32,7 +32,6 @@ public class CupcakeService {
         Connection connection = dbController.getConnection();
         Statement stmt = connection.createStatement();
         ResultSet rs = stmt.executeQuery("SELECT bottom FROM bottoms");
-
         List<String> bottoms = new ArrayList<>();
         while (rs.next()) {
             bottoms.add(rs.getString("bottom"));
@@ -143,7 +142,11 @@ public class CupcakeService {
 
     // Beregn totalprisen for kurven
     public double calculateTotalPrice() {
-        return cart.stream().mapToDouble(OrderLine::getTotalPrice).sum();
+        double total = 0.0;
+        for (OrderLine orderLine : cart) {
+            total += orderLine.getTotalPrice();
+        }
+        return total;
     }
 
     // Hent prisen fra databasen for en given bund eller topping
@@ -165,3 +168,6 @@ public class CupcakeService {
         return new ArrayList<>(cart);
     }
 }
+
+
+//Særlige forhold - Parsing til JSON data, Gennemgå al kode, sørg for alt giver mening og at der er gode kommentarer.
