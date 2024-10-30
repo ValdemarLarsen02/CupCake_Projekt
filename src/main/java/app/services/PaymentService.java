@@ -14,10 +14,12 @@ public class PaymentService {
     }
 
     public boolean processPayment(int customerId, double amount) {
-        String checkBalanceSQL = "SELECT balance FROM customers WHERE customer_id = ?";
-        String updateBalanceSQL = "UPDATE customers SET balance = balance - ? WHERE customer_id = ?";
+        String checkAccountSQL = "SELECT balance FROM customer_accounts WHERE user_id = ?";
+        String createAccountSQL = "INSERT INTO customer_accounts (user_id, balance) VALUES (?, ?)";
+        String updateBalanceSQL = "UPDATE customer_accounts SET balance = balance - ? WHERE user_id = ?";
+        String updateOrderStatusSQL = "UPDATE orders SET status = 'betalt' WHERE user_id = ?"; // SQL til opdatering af ordre-status
 
-        try (PreparedStatement checkStmt = connection.prepareStatement(checkBalanceSQL)) {
+        try (PreparedStatement checkStmt = connection.prepareStatement(checkAccountSQL)) {
             checkStmt.setInt(1, customerId);
             ResultSet rs = checkStmt.executeQuery();
 
@@ -29,11 +31,32 @@ public class PaymentService {
                     return false;  // Ikke tilstrækkelig balance
                 }
 
+                // Opdater saldoen
                 try (PreparedStatement updateStmt = connection.prepareStatement(updateBalanceSQL)) {
                     updateStmt.setDouble(1, amount);
                     updateStmt.setInt(2, customerId);
                     int rowsUpdated = updateStmt.executeUpdate();
+
+                    // Opdater ordre-status
+                    try (PreparedStatement updateOrderStmt = connection.prepareStatement(updateOrderStatusSQL)) {
+                        updateOrderStmt.setInt(1, customerId);
+                        updateOrderStmt.executeUpdate(); // Opdater ordre-status til 'betalt'
+                    }
+
                     return rowsUpdated > 0;  // Returnerer true, hvis betalingen gik igennem
+                }
+            } else {
+                // Hvis brugeren ikke findes, opret en ny konto med en saldo på 100kr
+                try (PreparedStatement createStmt = connection.prepareStatement(createAccountSQL)) {
+                    createStmt.setInt(1, customerId);
+                    createStmt.setDouble(2, 100);  // Start Saldo 100kr
+                    int rowsInserted = createStmt.executeUpdate();
+
+                    // Hvis kontoen blev oprettet, træk beløbet fra
+                    if (rowsInserted > 0) {
+                        // Kører nu metoden igne, efter konti er blevet oprettet!
+                        return processPayment(customerId, amount);  // Call the method recursively to deduct the amount
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -41,4 +64,5 @@ public class PaymentService {
         }
         return false;
     }
+
 }

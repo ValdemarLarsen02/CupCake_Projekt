@@ -1,6 +1,7 @@
 package app.controllers;
 
 import app.entities.Customer;
+import app.entities.User;
 import app.services.CupcakeService;
 import app.services.PaymentService;
 import io.javalin.Javalin;
@@ -21,13 +22,17 @@ public class PaymentController {
     public void registerRoutes(Javalin app) {
         app.get("/payment", this::showPaymentPage);
         app.post("/process-payment", this::processPayment);
+        app.get("/confirmation", ctx -> {
+            ctx.render("confirmation.html");  // Render admin.html skabelonen
+        });
     }
 
     // Metode til at vise betalingsside
     private void showPaymentPage(Context ctx) {
-        Customer currentCustomer = ctx.sessionAttribute("currentUser");
-        if (currentCustomer == null) {
-            ctx.redirect("/login");
+        User currentUser = ctx.sessionAttribute("currentUser");
+
+        if (currentUser == null) {
+            ctx.status(403).result("Adgang nægtet: Du skal være logget ind for at tilgå denne side.");
             return;
         }
 
@@ -36,14 +41,14 @@ public class PaymentController {
 
         ctx.attribute("cartItems", cartItems);
         ctx.attribute("totalPrice", totalPrice);
-        ctx.attribute("customerName", currentCustomer.getName());
+        ctx.attribute("customerName", currentUser.getUserName());
         ctx.render("payment.html");
     }
 
     // Metode til at håndtere betaling
     private void processPayment(Context ctx) {
-        Customer currentCustomer = ctx.sessionAttribute("currentUser");
-        if (currentCustomer == null) {
+        User currentUser = ctx.sessionAttribute("currentUser");
+        if (currentUser == null) {
             ctx.redirect("/login");
             return;
         }
@@ -55,13 +60,14 @@ public class PaymentController {
         }
 
         double amount = Double.parseDouble(amountParam);
-        int customerId = currentCustomer.getCustomerId();
+        int customerId = currentUser.getUserId();
         boolean paymentSuccess = paymentService.processPayment(customerId, amount);
 
         if (paymentSuccess) {
-            ctx.redirect("/confirmation");
+
+            ctx.render("confirmation.html");
         } else {
-            ctx.status(500).result("Payment failed. Please try again.");
+            ctx.status(500).result("Betaling fejlede prøv igen!");
         }
     }
 }

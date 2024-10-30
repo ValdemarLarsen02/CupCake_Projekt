@@ -23,6 +23,10 @@ public class User {
         return userId;
     }
 
+    public String getRole() {
+        return role;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -33,7 +37,6 @@ public class User {
     }
 
     public String getPassword() {
-        System.out.println(hashedPassword);
         return hashedPassword;
     }
 }

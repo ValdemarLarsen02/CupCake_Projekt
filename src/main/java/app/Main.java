@@ -2,10 +2,7 @@ package app;
 
 import app.config.SessionConfig;
 import app.config.ThymeleafConfig;
-import app.controllers.CupcakeController;
-import app.controllers.DatabaseController;
-import app.controllers.PaymentController;
-import app.controllers.UserController;
+import app.controllers.*;
 import app.services.CupcakeService;
 import app.services.PaymentService;
 import io.javalin.Javalin;
@@ -22,13 +19,14 @@ public class Main {
 
         // Initialiser DatabaseController
         DatabaseController dbController = new DatabaseController();
-
         // Initialiser services
         CupcakeService cupcakeService = CupcakeService.getInstance();
         PaymentService paymentService = new PaymentService(dbController.getConnection());
 
         // Initialiser controllers
         CupcakeController.registerRoutes(app);
+        AdminController.registerRoutes(app);
+        CustomerController.registerRoutes(app);
         UserController.addRoutes(app, dbController);
         PaymentController paymentController = new PaymentController(paymentService, cupcakeService);
         paymentController.registerRoutes(app);

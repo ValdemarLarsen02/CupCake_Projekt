@@ -11,24 +11,39 @@ public class DatabaseController {
 
     // Constructor
     public DatabaseController() {
-        Dotenv dotenv = Dotenv.load();
+        connect();
+    }
 
+    // Privat metode til at oprette forbindelse
+    private void connect() {
+        Dotenv dotenv = Dotenv.load();
         String dbUrl = dotenv.get("DB_URL");
         String dbUsername = dotenv.get("DB_USERNAME");
         String dbPassword = dotenv.get("DB_PASSWORD");
 
         try {
-            // Opretter forbindelse til databasen
             connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
-            System.out.println("Forbindelse til databasen blev oprettet.");
         } catch (SQLException e) {
             System.err.println("Kunne ikke oprette forbindelse til databasen: " + e.getMessage());
         }
     }
 
-    // Returnerer forbindelsen
+    // Returnerer forbindelsen og genetablerer hvis nødvendig
     public Connection getConnection() {
+        try {
+            if (connection == null || connection.isClosed()) {
+                reconnect();  // Brug reconnect til at genetablere forbindelsen
+            }
+        } catch (SQLException e) {
+            System.err.println("Fejl ved kontrol af forbindelse: " + e.getMessage());
+        }
         return connection;
+    }
+
+    // Genetablerer forbindelse
+    public void reconnect() {
+        closeConnection(); // Luk den gamle forbindelse, hvis den findes
+        connect(); // Opret en ny forbindelse
     }
 
     // Lukker forbindelsen
@@ -40,23 +55,6 @@ public class DatabaseController {
             }
         } catch (SQLException e) {
             System.err.println("Fejl ved lukning af forbindelse: " + e.getMessage());
-        }
-    }
-
-    // Genetablerer forbindelse (hvis nødvendigt)
-    public void reconnect() {
-        try {
-            if (connection == null || connection.isClosed()) {
-                Dotenv dotenv = Dotenv.load();
-                String dbUrl = dotenv.get("DB_URL");
-                String dbUsername = dotenv.get("DB_USERNAME");
-                String dbPassword = dotenv.get("DB_PASSWORD");
-
-                connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
-                System.out.println("Forbindelse til databasen blev genetableret.");
-            }
-        } catch (SQLException e) {
-            System.err.println("Kunne ikke genetablere forbindelse til databasen: " + e.getMessage());
         }
     }
 

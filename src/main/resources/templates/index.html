@@ -20,13 +20,24 @@
     <form action="/add-to-cart" method="POST">
 
         <div class="user-info d-flex justify-content-end p-3">
-        <span th:if="${session.currentUser != null}">
-            Logget ind som: <strong th:text="${session.currentUser.username}"></strong>
-            <a th:href="@{/logout}">Log af</a>
+    <span th:if="${session.currentUser != null}">
+        Logget ind som: <strong th:text="${session.currentUser.userName}"></strong>
+        <span>Bruger ID: <strong th:text="${session.currentUser.userId}"></strong></span>
+        <span>Rolle: <strong th:text="${session.currentUser.role}"></strong></span>
+        <a th:href="@{/logout}" class="btn btn-link">Log af</a>
+
+        <!-- Link til admin side hvis brugeren er admin -->
+        <span th:if="${session.currentUser.role == 'admin'}">
+            | <a th:href="@{/admin}" class="btn btn-link">Admin side</a>
         </span>
+
+        <!-- Knap til Mine bestillinger -->
+        <a th:href="@{/my-orders}" class="btn btn-info ms-2">Mine bestillinger</a>
+    </span>
+
             <span th:if="${session.currentUser == null}">
-            Ikke logget på | <a th:href="@{/tilLogin}">Log på</a>
-        </span>
+        Ikke logget på | <a th:href="@{/tilLogin}">Log på</a>
+    </span>
         </div>
 
 

@@ -1,9 +1,14 @@
 package app.controllers;
 
+import app.entities.CustomerInformation;
+import app.entities.Order;
+import app.entities.User;
 import app.services.KundeService;
 import app.controllers.DatabaseController;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
+
+import java.util.List;
 
 public class CustomerController {
 
@@ -12,20 +17,31 @@ public class CustomerController {
 
     public static void registerRoutes(Javalin app) {
         // Route til at vise oprettelsesformularen
-        app.get("/create-user", ctx -> showCreateUserForm(ctx));
 
-        // Route til at oprette en ny kunde
-        app.post("/create-user", ctx -> createUser(ctx));
+        app.get("/my-orders", ctx -> {
+            // Hent currentUser fra sessionen
+            User currentUser = ctx.sessionAttribute("currentUser");
 
-        // Route til at vise loginformularen
-        app.get("/login", ctx -> showLoginForm(ctx));
+            if (currentUser == null) {
+                ctx.status(403).result("Adgang nægtet: Du skal være logget ind for at se dine ordrer.");
+                return;
+            }
 
-        // Route til at logge en kunde ind
-        app.post("/login", ctx -> loginUser(ctx));
+            Integer userId = currentUser.getUserId(); // Hent userId fra currentUser
+            System.out.println(userId);
+            CustomerInformation customerInfo = new CustomerInformation();
+            List<Order> userOrders = customerInfo.getCustomerOrders(userId);
 
-        // Route til at logge en kunde ud
-        app.post("/logout", ctx -> logoutUser(ctx));
+            // Giv ordrer til Thymeleaf
+            ctx.attribute("userOrders", userOrders);
+            ctx.render("my-orders.html");  // Render my-orders.html skabelonen
+        });
+
+
+
     }
+
+
 
     // Metode til at vise oprettelsesformularen
     private static void showCreateUserForm(Context ctx) {

@@ -1,55 +1,90 @@
 package app.controllers;
 
-import app.entities.Admin;
+import app.admin.Admin;
 import io.javalin.Javalin;
-
-import java.sql.Connection;
 
 public class AdminController {
 
-    private final Connection connection;
-
-    // Constructor der modtager en databaseforbindelse
-    public AdminController(Connection connection) {
-        this.connection = connection;
-    }
-
-    // Registrer ruter
-    public void registerRoutes(Javalin app) {
+    // Registering af vores routes / DATA TRANSFER.
+    public static void registerRoutes(Javalin app) {
         app.get("/admin", ctx -> {
-            int userid = 1;  // Dette userid kan komme fra login-session eller en anden kilde
-            Admin admin = new Admin(connection);
-            boolean found = admin.loadAdminById(userid);
-
-            if (found) {
-                // Sæt attributter baseret på de indlæste admin-data
-                ctx.attribute("adminName", admin.getName());
-                ctx.attribute("adminEmail", admin.getEmail());
-                ctx.render("admin.html");  // Render admin.html skabelonen med data
-            } else {
-                ctx.status(404).result("Admin ikke fundet.");
-            }
+            Admin admin = new Admin();
+            ctx.attribute("orders", admin.getOrders());
+            ctx.attribute("kunder", admin.getUsers());
+            ctx.render("admin.html");
         });
 
-        // Eksempel på at bruge admin i en anden route, f.eks. indsættelse af penge
-        app.post("/admin/indsaet-beloeb", ctx -> {
-            String customerIdParam = ctx.formParam("customerId");
-            String amountParam = ctx.formParam("amount");
 
-            if (customerIdParam == null || amountParam == null) {
-                ctx.status(400).result("Kunde ID eller beløb mangler.");
+
+
+        app.post("/admin/delete-order", ctx -> {
+            String orderIdParam = ctx.formParam("orderId");  // Henter orderId fra formen
+
+            // Tjekker om vi korrekt modtager et orderId i vores post kald.
+            if (orderIdParam == null) {
+                ctx.status(400).result("Order ID mangler");
                 return;
             }
 
-            int customerId = Integer.parseInt(customerIdParam);
-            double amount = Double.parseDouble(amountParam);
+            int orderId = Integer.parseInt(orderIdParam);  // Konverterer orderId til et heltal
+            Admin admin = new Admin();
+            admin.deleteOrder(orderId);
+            ctx.redirect("/admin");  // Efter sletning, redirect til admin-siden
+        });
 
-            Admin admin = new Admin(connection);
-            admin.loadAdminById(1);  // Antager en admin session
+        // Route til opdatering/indsættelse af kundes konto.
+        app.post("/admin/upsert-customer-account", ctx -> {
+            String userIdParam = ctx.formParam("userId"); // brugersn id.
+            String balanceParam = ctx.formParam("initialBalance"); // Saldo der bliver indsat
+            // Tjekker om vi korrekt modtager userId og balance i vores post kald.
+            if (userIdParam == null || balanceParam == null) {
+                ctx.status(400).result("User ID eller balance mangler");
+                return;
+            }
 
-            admin.depositFunds(customerId, amount);  // Brug admin til at indsætte penge på kundekonto
+            try {
+                int userId = Integer.parseInt(userIdParam);
+                double initialBalance = Double.parseDouble(balanceParam);
 
-            ctx.redirect("/admin");  // Tilbage til admin dashboard efter operation
+                Admin admin = new Admin();
+                boolean success = admin.upsertCustomerAccount(userId, initialBalance);
+
+                if (success) {
+                    ctx.redirect("/admin"); // Redirect til admin-siden efter succes
+                } else {
+                    ctx.status(500).result("Fejl under opdatering/indsættelse af konto");
+                }
+            } catch(NumberFormatException e) {
+                ctx.status(400).result("Ugyldig format for User ID eller balance");
+            }
+
+        });
+
+        app.post("/admin/create-payment", ctx -> {
+            String orderIdParam = ctx.formParam("orderId");
+            String amountParam = ctx.formParam("amount");
+
+            // Tjekker om vi korrekt modtager orderId og amount i vores post kald.
+            if (orderIdParam == null || amountParam == null) {
+                ctx.status(400).result("Order ID eller beløb mangler");
+                return;
+            }
+
+            try {
+                int orderId = Integer.parseInt(orderIdParam);  // Konverterer orderId til et heltal
+                double amount = Double.parseDouble(amountParam);  // Konverterer beløb til double
+
+                Admin admin = new Admin();
+                boolean success = admin.createPayment(orderId, amount);
+
+                if (success) {
+                    ctx.redirect("/admin"); // Redirect til admin-siden efter succes
+                } else {
+                    ctx.status(500).result("Fejl under opkrævning af betaling");
+                }
+            } catch (NumberFormatException e) {
+                ctx.status(400).result("Ugyldig format for Order ID eller beløb");
+            }
         });
     }
 }
