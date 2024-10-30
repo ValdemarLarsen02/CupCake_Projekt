@@ -133,7 +133,6 @@ public class CupcakeService {
         } finally {
             if (connection != null && !connection.isClosed()) {
                 connection.setAutoCommit(true);
-                connection.close();
             }
         }
 
