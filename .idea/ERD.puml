@@ -1,0 +1,56 @@
+@startuml ERDiagram
+!pragma layout smetana
+
+entity Admin {
+    +user_id: INT
+    +name: VARCHAR
+    +email: VARCHAR
+    +phone: VARCHAR
+    +role: VARCHAR
+    +password: VARCHAR
+}
+
+entity Bottoms {
+    +id: INT
+    +bottom: VARCHAR
+    +price: DECIMAL
+}
+
+entity Toppings {
+    +id: INT
+    +bottom: VARCHAR
+    +price: DECIMAL
+}
+
+entity Customer {
+    +id: INT
+    +name: VARCHAR
+    +email: VARCHAR
+    +phone: VARCHAR
+    +role: VARCHAR
+    +password: VARCHAR
+    +balance: DECIMAL
+}
+
+entity Orders {
+    +order_id: INT
+    +customer_name: VARCHAR
+    +order_details: TEXT
+    +order_date: DATE
+    +status: VARCHAR
+    +total_price: DECIMAL
+}
+
+entity User {
+    +user_id: INT
+    +username: VARCHAR
+    +password: VARCHAR
+    +role: VARCHAR
+}
+
+Admin -- User : "1..*"
+Customer -- Orders : "1..*"
+Orders -- Bottoms : "1..*"
+Orders -- Toppings : "1..*"
+
+@enduml
