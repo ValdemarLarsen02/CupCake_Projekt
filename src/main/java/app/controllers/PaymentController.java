@@ -32,7 +32,8 @@ public class PaymentController {
         User currentUser = ctx.sessionAttribute("currentUser");
 
         if (currentUser == null) {
-            ctx.status(403).result("Adgang nægtet: Du skal være logget ind for at tilgå denne side.");
+            ctx.attribute("message", "Tak for din ordre. Din ordre kræver manuel behandling, da du ikke er logget ind.");
+            ctx.render("manual_processing.html");
             return;
         }
 

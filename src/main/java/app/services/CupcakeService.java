@@ -11,7 +11,6 @@ import java.util.Map;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
 public class CupcakeService {
 
     private static final CupcakeService instance = new CupcakeService();
@@ -21,65 +20,65 @@ public class CupcakeService {
     private CupcakeService() {
     }
 
-    // Metode til at hente singleton-instansen
+    // Singleton pattern for at sikre én instans af CupcakeService
     public static CupcakeService getInstance() {
         return instance;
     }
 
-    // Hent bunde
-    public List<String> getBottoms() throws SQLException {
-        System.out.println(cart.size());
-        Connection connection = dbController.getConnection();
-        Statement stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT bottom FROM bottoms");
+    // Hent bunde fra databasen og returner som en liste af strings
+    public List<String> getBottoms() {
         List<String> bottoms = new ArrayList<>();
-        while (rs.next()) {
-            bottoms.add(rs.getString("bottom"));
-        }
+        try (Connection connection = dbController.getConnection();
+             Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT bottom FROM bottoms")) {
 
+            while (rs.next()) {
+                bottoms.add(rs.getString("bottom"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Fejl ved hentning af bunde: " + e.getMessage());
+        }
         return bottoms;
     }
 
-    // Hent toppings
-    public List<String> getToppings() throws SQLException {
-        Connection connection = dbController.getConnection();
-        Statement stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT topping FROM toppings");
-
+    // Hent toppings fra databasen og returner som en liste af strings
+    public List<String> getToppings() {
         List<String> toppings = new ArrayList<>();
-        while (rs.next()) {
-            toppings.add(rs.getString("topping"));
-        }
+        try (Connection connection = dbController.getConnection();
+             Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT topping FROM toppings")) {
 
+            while (rs.next()) {
+                toppings.add(rs.getString("topping"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Fejl ved hentning af toppings: " + e.getMessage());
+        }
         return toppings;
     }
 
-    // Tilføj ordre til kurven og databasen
-    public void addToCart(int userId, String customerName, String bottom, String topping, int quantity, boolean isPaid) throws SQLException {
-        Connection connection = dbController.getConnection();
-        ObjectMapper objectMapper = new ObjectMapper();
+    // Tilføj ordre til kurv og databasen
+    public void addToCart(int userId, String customerName, String bottom, String topping, int quantity, boolean isPaid) {
+        try (Connection connection = dbController.getConnection()) {
+            connection.setAutoCommit(false); // Start en database-transaktion
 
-        try {
-            connection.setAutoCommit(false);  // Start transaktion
-
-            // Beregn priser
+            // Beregn priser for bund og topping
             double bottomPrice = getPriceFromDatabase("bottoms", bottom, connection);
             double toppingPrice = getPriceFromDatabase("toppings", topping, connection);
             double totalPrice = (bottomPrice + toppingPrice) * quantity;
 
-            // Tilføj ordren til en lokal kurv
+            // Tilføj ordren til den lokale kurv
             cart.add(new OrderLine(bottom, topping, quantity, totalPrice));
 
-            // order_details som JSON
-            String orderDetailsJson = objectMapper.writeValueAsString(
-                    Map.of(
-                            "bottom", bottom,
-                            "topping", topping,
-                            "quantity", quantity
-                    )
-            );
+            // Konverter ordreoplysninger til JSON-format
+            ObjectMapper objectMapper = new ObjectMapper();
+            String orderDetailsJson = objectMapper.writeValueAsString(Map.of(
+                    "bottom", bottom,
+                    "topping", topping,
+                    "quantity", quantity
+            ));
 
-            // Indsæt ordren i databasen
+            // Opret en ny ordre i databasen
             String query = "INSERT INTO orders (user_id, customer_name, order_details, order_date, status, total_price) VALUES (?, ?, ?::jsonb, ?, ?, ?)";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setInt(1, userId);
@@ -90,27 +89,22 @@ public class CupcakeService {
                 statement.setDouble(6, totalPrice);
 
                 statement.executeUpdate();
-                connection.commit();  // Bekræft transaktion
-                System.out.println("Order was added to the database for customer: " + customerName + " with user ID: " + userId);
+                connection.commit();  // Bekræft transaktionen
             } catch (SQLException e) {
-                connection.rollback();  // Undo hvis fejl skulle forekomme
-                throw new SQLException("Error inserting order into the database: " + e.getMessage());
+                connection.rollback();  // Rul tilbage ved fejl i databaseoperationen
+                System.out.println("Fejl ved indsættelse af ordre i databasen: " + e.getMessage());
             }
-
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException | JsonProcessingException e) {
+            System.out.println("Fejl i addToCart: " + e.getMessage());
         }
     }
 
-
     // Fjern en ordre fra kurven og databasen
-    public void removeFromCart(int orderLineId) throws SQLException {
-        Connection connection = dbController.getConnection();
+    public void removeFromCart(int orderLineId) {
+        try (Connection connection = dbController.getConnection()) {
+            connection.setAutoCommit(false);  // Start en database-transaktion
 
-        try {
-            connection.setAutoCommit(false);  // Start transaktion
-
-            // Fjern fra databasen
+            // Fjern ordren fra databasen
             String query = "DELETE FROM orders WHERE order_id = ?";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setInt(1, orderLineId);
@@ -120,27 +114,19 @@ public class CupcakeService {
                     System.out.println("Ordre med ID " + orderLineId + " blev slettet fra databasen.");
                     connection.commit();  // Bekræft transaktionen
                 } else {
-                    connection.rollback();  // Rul tilbage hvis ingen rækker blev slettet
+                    connection.rollback();  // Rul tilbage, hvis ingen rækker blev slettet
                     System.out.println("Ordre med ID " + orderLineId + " blev ikke fundet.");
                 }
             }
         } catch (SQLException e) {
-            if (connection != null && !connection.isClosed()) {
-                connection.rollback();  // Rul transaktionen tilbage ved fejl, hvis forbindelsen er åben
-            }
-            throw new SQLException("Fejl ved fjernelse af ordre fra databasen: " + e.getMessage());
-        } finally {
-            if (connection != null && !connection.isClosed()) {
-                connection.setAutoCommit(true);
-            }
+            System.out.println("Fejl ved fjernelse af ordre fra databasen: " + e.getMessage());
         }
 
-        // Fjern fra den lokale kurv
+        // Fjern ordren fra den lokale kurv
         cart.removeIf(orderLine -> orderLine.getId() == orderLineId);
     }
 
-
-    // Beregn totalprisen for kurven
+    // Beregn totalprisen for alle varer i kurven
     public double calculateTotalPrice() {
         double total = 0.0;
         for (OrderLine orderLine : cart) {
@@ -149,25 +135,27 @@ public class CupcakeService {
         return total;
     }
 
-    // Hent prisen fra databasen for en given bund eller topping
-    private double getPriceFromDatabase(String table, String name, Connection connection) throws SQLException {
-        String column = table.equals("toppings") ? "topping" : "bottom";
-        PreparedStatement stmt = connection.prepareStatement("SELECT price FROM " + table + " WHERE " + column + " = ?");
-        stmt.setString(1, name);
-        ResultSet rs = stmt.executeQuery();
-
+    // Hent prisen for en given bund eller topping fra databasen
+    private double getPriceFromDatabase(String table, String name, Connection connection) {
         double price = 0;
-        if (rs.next()) {
-            price = rs.getDouble("price");
-        }
+        String column = table.equals("toppings") ? "topping" : "bottom";
+        String query = "SELECT price FROM " + table + " WHERE " + column + " = ?";
 
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, name);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    price = rs.getDouble("price");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Fejl ved hentning af pris fra " + table + ": " + e.getMessage());
+        }
         return price;
     }
+
 
     public List<OrderLine> getCartItems() {
         return new ArrayList<>(cart);
     }
 }
-
-
-//Særlige forhold - Parsing til JSON data, Gennemgå al kode, sørg for alt giver mening og at der er gode kommentarer.

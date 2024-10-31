@@ -15,8 +15,6 @@ public class AdminController {
         });
 
 
-
-
         app.post("/admin/delete-order", ctx -> {
             String orderIdParam = ctx.formParam("orderId");  // Henter orderId fra formen
 
@@ -54,7 +52,7 @@ public class AdminController {
                 } else {
                     ctx.status(500).result("Fejl under opdatering/indsættelse af konto");
                 }
-            } catch(NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 ctx.status(400).result("Ugyldig format for User ID eller balance");
             }
 

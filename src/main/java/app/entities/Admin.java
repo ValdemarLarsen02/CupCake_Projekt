@@ -1,4 +1,5 @@
 package app.admin;
+
 import app.controllers.DatabaseController;
 import app.entities.CustomerDetails;
 import app.entities.Order;
@@ -80,7 +81,7 @@ public class Admin {
     }
 
     public boolean upsertCustomerAccount(int userId, double initialBalance) {
-        DatabaseController db = new DatabaseController(); // Opretter DatabaseController her
+        DatabaseController db = new DatabaseController();
         PreparedStatement checkAccountStmt = null;
         PreparedStatement updateAccountStmt = null;
         PreparedStatement insertAccountStmt = null;
@@ -148,7 +149,6 @@ public class Admin {
             PreparedStatement getUserIdStmt = connection.prepareStatement(getUserIdQuery);
             getUserIdStmt.setInt(1, orderId);
             ResultSet userIdResult = getUserIdStmt.executeQuery();
-
 
 
             //Hvis fundes:
