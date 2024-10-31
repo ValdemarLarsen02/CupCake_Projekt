@@ -80,7 +80,7 @@ public class Admin {
     }
 
     public boolean upsertCustomerAccount(int userId, double initialBalance) {
-        DatabaseController db = new DatabaseController(); // Opretter DatabaseController her
+        DatabaseController db = new DatabaseController();
         PreparedStatement checkAccountStmt = null;
         PreparedStatement updateAccountStmt = null;
         PreparedStatement insertAccountStmt = null;

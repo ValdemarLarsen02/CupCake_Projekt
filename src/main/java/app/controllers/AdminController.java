@@ -15,8 +15,6 @@ public class AdminController {
         });
 
 
-
-
         app.post("/admin/delete-order", ctx -> {
             String orderIdParam = ctx.formParam("orderId");  // Henter orderId fra formen
 
