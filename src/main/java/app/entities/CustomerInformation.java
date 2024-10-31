@@ -56,4 +56,32 @@ public class CustomerInformation {
 
         return orders;  // Returner listen af ordrer
     }
+
+    public static boolean removeOrder(int orderId) { // Lavet static for at vi kan kalde vores removeOrder.
+        DatabaseController db = new DatabaseController();
+        Connection connection = null;
+        try {
+            connection = db.getConnection();
+            String deleteQuery = "DELETE FROM orders WHERE order_id = ?";
+            PreparedStatement statement = connection.prepareStatement(deleteQuery);
+            statement.setInt(1, orderId);
+
+            // Udfør DELETE forespørgslen
+            int rowsAffected = statement.executeUpdate();
+
+            // Returner korrekt hvis slettet.
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            ErrorLogger.logError(e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close(); // Luk forbindelsen
+                } catch (SQLException e) {
+                    ErrorLogger.logError(e);
+                }
+            }
+        }
+        return false;
+    }
 }

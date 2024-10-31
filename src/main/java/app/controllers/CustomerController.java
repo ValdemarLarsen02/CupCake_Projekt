@@ -38,7 +38,24 @@ public class CustomerController {
         });
 
 
+        app.post("/remove-order", ctx -> {
+            int orderId = Integer.parseInt(ctx.formParam("orderId"));
+            System.out.println(orderId);
+
+            boolean status = CustomerInformation.removeOrder(orderId);
+
+            if (status) {
+                ctx.render("my-orders.html");
+            } else {
+                System.out.println("Der gik noget galt");
+            }
+
+        });
+
+
+
     }
+
 
 
     // Metode til at vise oprettelsesformularen
