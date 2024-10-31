@@ -54,8 +54,8 @@ public class PaymentService {
 
                     // Hvis kontoen blev oprettet, træk beløbet fra
                     if (rowsInserted > 0) {
-                        // Kører nu metoden igne, efter konti er blevet oprettet!
-                        return processPayment(customerId, amount);  // Call the method recursively to deduct the amount
+                        // Kører nu metoden igen, efter konti er blevet oprettet!
+                        return processPayment(customerId, amount);
                     }
                 }
             }

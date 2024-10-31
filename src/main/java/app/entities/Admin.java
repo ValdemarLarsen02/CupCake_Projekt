@@ -1,4 +1,5 @@
 package app.admin;
+
 import app.controllers.DatabaseController;
 import app.entities.CustomerDetails;
 import app.entities.Order;
@@ -148,7 +149,6 @@ public class Admin {
             PreparedStatement getUserIdStmt = connection.prepareStatement(getUserIdQuery);
             getUserIdStmt.setInt(1, orderId);
             ResultSet userIdResult = getUserIdStmt.executeQuery();
-
 
 
             //Hvis fundes:

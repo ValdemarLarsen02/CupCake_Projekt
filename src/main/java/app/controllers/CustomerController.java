@@ -38,9 +38,7 @@ public class CustomerController {
         });
 
 
-
     }
-
 
 
     // Metode til at vise oprettelsesformularen

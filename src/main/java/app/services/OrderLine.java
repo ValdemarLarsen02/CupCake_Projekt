@@ -20,6 +20,10 @@ public class OrderLine {
         return id;
     }
 
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
     public String getBottom() {
         return bottom;
     }
@@ -30,9 +34,5 @@ public class OrderLine {
 
     public int getQuantity() {
         return quantity;
-    }
-
-    public double getTotalPrice() {
-        return totalPrice;
     }
 }
